@@ -3,11 +3,12 @@ package com.yoong.projectyoongbackend.domain.auth.member.service
 import com.yoong.projectyoongbackend.common.dto.DefaultResponse
 import com.yoong.projectyoongbackend.domain.auth.member.dto.CreateMemberDto
 import com.yoong.projectyoongbackend.domain.auth.member.dto.MemberLoginDto
+import com.yoong.projectyoongbackend.domain.auth.member.dto.ValidType
+import com.yoong.projectyoongbackend.domain.auth.member.dto.ValidateMemberDto
 import com.yoong.projectyoongbackend.domain.auth.member.entity.Member
 import com.yoong.projectyoongbackend.domain.auth.member.enumClass.Position
 import com.yoong.projectyoongbackend.domain.auth.member.enumClass.Role
 import com.yoong.projectyoongbackend.domain.auth.member.repository.MemberRepository
-import com.yoong.projectyoongbackend.domain.auth.team.entity.Team
 import com.yoong.projectyoongbackend.domain.auth.team.repository.TeamRepository
 import com.yoong.projectyoongbackend.infra.jwt.JwtPlugin
 import com.yoong.projectyoongbackend.infra.jwt.PasswordEncoder
@@ -26,19 +27,17 @@ class MemberService(
     @Transactional
     fun signUp(createMemberDto: CreateMemberDto): DefaultResponse {
 
-        val dummyTeam = teamRepository.findByDummyTeam()
+        val member = memberRepository.findByIdOrNull(createMemberDto.id) ?: throw RuntimeException("아이디가 존재 하지 않습니다")
 
-        memberRepository.save(
-            Member(
-                userId = createMemberDto.userId,
-                password = passwordEncoder.encode(createMemberDto.password),
-                nickName = createMemberDto.nickname,
-                email = createMemberDto.email,
-                role = Role.MEMBER,
-                position = Position.MEMBER,
-                team = dummyTeam
-            )
-        )
+        if(member.isId && member.isEmail && member.isNickName) {
+
+            val dummyTeam = teamRepository.findByDummyTeam()
+
+            member.updateProfile(createMemberDto, dummyTeam)
+
+            memberRepository.save(member)
+
+        }else throw RuntimeException("중복 검사를 진행해 주세요")
 
         return DefaultResponse.from("회원 가입이 완료 되었습니다")
     }
@@ -57,5 +56,86 @@ class MemberService(
         }
 
         throw RuntimeException("로그인에 실패 하였습니다!! 다시 로그인 해 주세요")
+    }
+
+    @Transactional
+    fun duplicateValidate(validateMemberDto: ValidateMemberDto): DefaultResponse {
+
+        when(validateMemberDto.validType){
+            ValidType.USER_ID -> {
+                if(memberRepository.existsByUserId(validateMemberDto.validArgument)) throw RuntimeException("중복 되는 아이디 값이 존재 합니다")
+                if(validateMemberDto.validId == null){
+                    val member = memberRepository.saveAndFlush(
+                        Member(
+                            userId = validateMemberDto.validArgument,
+                            password = "",
+                            email = "",
+                            nickname = "",
+                            role = Role.MEMBER,
+                            position = Position.MEMBER,
+                            team = null
+                        )
+                    )
+
+                    member.apply { isId = true }
+                }else{
+                    val member = memberRepository.findByIdOrNull(validateMemberDto.validId)?: throw RuntimeException("맴버가 존재 하지 않습니다")
+
+                    member.updateValid(validateMemberDto.validType, validateMemberDto.validArgument)
+
+                    memberRepository.save(member)
+                }
+            }
+            ValidType.EMAIL -> {
+                if(memberRepository.existsByEmail(validateMemberDto.validArgument)) throw RuntimeException("중복 되는 이메일 값이 존재 합니다")
+                if(validateMemberDto.validId == null){
+                    val member = memberRepository.saveAndFlush(
+                        Member(
+                            userId = "",
+                            password = "",
+                            email = validateMemberDto.validArgument,
+                            nickname = "",
+                            role = Role.MEMBER,
+                            position = Position.MEMBER,
+                            team = null
+                        )
+                    )
+
+                    member.apply { isEmail = true }
+                }else{
+                    val member = memberRepository.findByIdOrNull(validateMemberDto.validId)?: throw RuntimeException("맴버가 존재 하지 않습니다")
+
+                    member.updateValid(validateMemberDto.validType, validateMemberDto.validArgument)
+
+                    memberRepository.save(member)
+                }
+            }
+            ValidType.NICKNAME -> {
+                if(memberRepository.existsByNickname(validateMemberDto.validArgument)) throw RuntimeException("중복 되는 닉네임 값이 존재 합니다")
+                if(validateMemberDto.validId == null){
+                    val member = memberRepository.saveAndFlush(
+                        Member(
+                            userId = "",
+                            password = "",
+                            email = "",
+                            nickname = validateMemberDto.validArgument,
+                            role = Role.MEMBER,
+                            position = Position.MEMBER,
+                            team = null
+                        )
+                    )
+
+                    member.apply { isNickName = true }
+                }else{
+                    val member = memberRepository.findByIdOrNull(validateMemberDto.validId)?: throw RuntimeException("맴버가 존재 하지 않습니다")
+
+                    member.updateValid(validateMemberDto.validType, validateMemberDto.validArgument)
+
+                    memberRepository.save(member)
+                }
+            }
+        }
+
+        return DefaultResponse.from("중복 확인 완료 되었습니다")
     }
 }

@@ -10,11 +10,28 @@ interface MemberRepository {
     fun save(member: Member): Member
 
     fun findByUserId(userId: String): Member?
+
+    fun existsByUserId(userId: String): Boolean
+
+    fun existsByNickname(nickname: String): Boolean
+
+    fun existsByEmail(email: String): Boolean
+
+    fun saveAndFlush(member: Member): Member
+
+    fun findByIdOrNull(validId: Long): Member?
 }
 
 interface MemberJpaRepository : JpaRepository<Member, Long>{
 
     fun findByUserId(userId: String): Member?
+
+    fun existsByUserId(userId: String): Boolean
+
+    fun existsByNickname(nickname: String): Boolean
+
+    fun existsByEmail(email: String): Boolean
+
 }
 
 @Repository
@@ -25,4 +42,14 @@ class MemberRepositoryImpl(
     override fun save(member: Member): Member = memberJpaRepository.save(member)
 
     override fun findByUserId(userId: String): Member? = memberJpaRepository.findByUserId(userId)
+
+    override fun existsByUserId(userId: String): Boolean = memberJpaRepository.existsByUserId(userId)
+
+    override fun existsByNickname(nickname: String): Boolean = memberJpaRepository.existsByNickname(nickname)
+
+    override fun existsByEmail(email: String): Boolean = memberJpaRepository.existsByEmail(email)
+
+    override fun saveAndFlush(member: Member): Member = memberJpaRepository.saveAndFlush(member)
+
+    override fun findByIdOrNull(validId: Long): Member? = memberJpaRepository.findByIdOrNull(validId)
 }
