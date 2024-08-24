@@ -8,3 +8,10 @@ spring:
         ddl-auto: none
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
+
+auth:
+  jwt:
+    issuer: "yoong.com"
+    secret: "sdvoejrlfvndkvoeowijnc123439mdslkdjj32"
+    accessTokenExpirationHour: 168
+    refreshTokenExpirationHour: 168
