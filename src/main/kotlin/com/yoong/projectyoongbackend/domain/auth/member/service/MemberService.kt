@@ -7,22 +7,26 @@ import com.yoong.projectyoongbackend.domain.auth.member.entity.Member
 import com.yoong.projectyoongbackend.domain.auth.member.enumClass.Position
 import com.yoong.projectyoongbackend.domain.auth.member.enumClass.Role
 import com.yoong.projectyoongbackend.domain.auth.member.repository.MemberRepository
+import com.yoong.projectyoongbackend.domain.auth.team.entity.Team
+import com.yoong.projectyoongbackend.domain.auth.team.repository.TeamRepository
 import com.yoong.projectyoongbackend.infra.jwt.JwtPlugin
 import com.yoong.projectyoongbackend.infra.jwt.PasswordEncoder
-import org.springframework.boot.json.JsonWriter
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class MemberService(
     private val memberRepository: MemberRepository,
-    private val jwtPlugin: JwtPlugin
+    private val jwtPlugin: JwtPlugin,
+    private val teamRepository: TeamRepository,
 ){
 
     private val passwordEncoder = PasswordEncoder().bCryptPasswordEncoder()
 
     @Transactional
     fun signUp(createMemberDto: CreateMemberDto): DefaultResponse {
+
+        val dummyTeam = teamRepository.findByDummyTeam()
 
         memberRepository.save(
             Member(
@@ -31,7 +35,8 @@ class MemberService(
                 nickName = createMemberDto.nickname,
                 email = createMemberDto.email,
                 role = Role.MEMBER,
-                position = Position.MEMBER
+                position = Position.MEMBER,
+                team = dummyTeam
             )
         )
 
