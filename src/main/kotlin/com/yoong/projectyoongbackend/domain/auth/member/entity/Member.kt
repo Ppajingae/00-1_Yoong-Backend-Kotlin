@@ -1,6 +1,5 @@
 package com.yoong.projectyoongbackend.domain.auth.member.entity
 
-import com.yoong.projectyoongbackend.domain.auth.member.dto.CreateMemberDto
 import com.yoong.projectyoongbackend.domain.auth.member.dto.ValidType
 import com.yoong.projectyoongbackend.domain.auth.member.enumClass.Position
 import com.yoong.projectyoongbackend.domain.auth.member.enumClass.Role
@@ -81,8 +80,28 @@ class Member(
         }
     }
 
-    fun updateProfile(createMemberDto: CreateMemberDto, team: Team){
+    fun updateProfile(password: String, team: Team){
         this.team = team
-        this.password = createMemberDto.password
+        this.password = password
     }
+
+    fun setRoleAndPosition(setRole: Role, setPosition: Position) {
+        this.role = setRole
+        this.position = setPosition
+    }
+
+    fun setManager() {
+        this.position = Position.MANAGER
+    }
+
+    fun setMember(setTeam: Team, setRole: Role, setPosition: Position) {
+        this.role = setRole
+        this.team = setTeam
+        this.position = setPosition
+    }
+
+    fun approveTeam(setTeam: Team) {
+        this.team = setTeam
+    }
+
 }

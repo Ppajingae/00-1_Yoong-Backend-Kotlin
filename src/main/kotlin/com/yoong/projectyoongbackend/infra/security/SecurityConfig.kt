@@ -34,7 +34,9 @@ class SecurityConfig(
             .cors { }
             .authorizeHttpRequests {
                 it.requestMatchers(
-                    "/api/v1/**" //TODO("삭제 예정")
+                    "/api/v1/**", //TODO("삭제 예정")
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
                 ).permitAll()
                     .anyRequest().authenticated()
             }

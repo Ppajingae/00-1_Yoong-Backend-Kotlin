@@ -15,4 +15,5 @@ data class UserPrincipal(
         roles.map { SimpleGrantedAuthority("ROLE_$it") },
         positions.map { SimpleGrantedAuthority("POSITION_$it") }
     )
+
 }

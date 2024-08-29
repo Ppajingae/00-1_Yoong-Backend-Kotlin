@@ -33,7 +33,9 @@ class MemberService(
 
             val dummyTeam = teamRepository.findByDummyTeam()
 
-            member.updateProfile(createMemberDto, dummyTeam)
+            val password = passwordEncoder.encode(createMemberDto.password)
+
+            member.updateProfile(password, dummyTeam)
 
             memberRepository.save(member)
 
