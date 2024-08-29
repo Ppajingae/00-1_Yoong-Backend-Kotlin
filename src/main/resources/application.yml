@@ -1,3 +1,4 @@
+
 spring:
   jpa:
     properties:
@@ -15,3 +16,15 @@ auth:
     secret: "sdvoejrlfvndkvoeowijnc123439mdslkdjj32"
     accessTokenExpirationHour: 168
     refreshTokenExpirationHour: 168
+server:
+  port: 80
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /index.html
+    operationsSorter: alpha
+    tagsSorter: alpha
+    url: /v3/api-docs
+    disable-swagger-default-url: true

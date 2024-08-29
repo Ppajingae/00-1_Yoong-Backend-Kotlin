@@ -20,6 +20,7 @@ interface MemberRepository {
     fun saveAndFlush(member: Member): Member
 
     fun findByIdOrNull(validId: Long): Member?
+
 }
 
 interface MemberJpaRepository : JpaRepository<Member, Long>{

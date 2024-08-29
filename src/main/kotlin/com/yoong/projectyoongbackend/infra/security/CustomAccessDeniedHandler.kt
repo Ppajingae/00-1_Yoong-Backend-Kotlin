@@ -1,6 +1,7 @@
 package com.yoong.projectyoongbackend.infra.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.yoong.projectyoongbackend.common.dto.ErrorResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.MediaType
@@ -20,7 +21,7 @@ class CustomAccessDeniedHandler : AccessDeniedHandler {
         response.characterEncoding = "UTF-8"
 
         val objectMapper = ObjectMapper()
-        val jsonString = objectMapper.writeValueAsString(RuntimeException("No permission to run API"))
+        val jsonString = objectMapper.writeValueAsString(ErrorResponse(403, "권한이 없습니다"))
         response.writer.write(jsonString)
     }
 }

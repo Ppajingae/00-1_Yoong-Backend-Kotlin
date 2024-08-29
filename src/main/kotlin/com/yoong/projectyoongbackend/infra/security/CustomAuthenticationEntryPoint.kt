@@ -1,6 +1,7 @@
 package com.yoong.projectyoongbackend.infra.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.yoong.projectyoongbackend.common.dto.ErrorResponse
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.MediaType
@@ -21,7 +22,7 @@ class CustomAuthenticationEntryPoint : AuthenticationEntryPoint {
         response.characterEncoding = "UTF-8"
 
         val objectMapper = ObjectMapper()
-        val jsonString = objectMapper.writeValueAsString(RuntimeException("Jwt Authentication Error"))
+        val jsonString = objectMapper.writeValueAsString(ErrorResponse(401,"JWT 인증 애러"))
         response.writer.write(jsonString)
     }
 }
