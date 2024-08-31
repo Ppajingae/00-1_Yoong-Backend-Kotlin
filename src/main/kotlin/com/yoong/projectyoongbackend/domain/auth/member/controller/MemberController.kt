@@ -32,5 +32,5 @@ class MemberController(
     @PostMapping("/sign-up/valid")
     fun duplicateValidate(
         @RequestBody validateMemberDto: ValidateMemberDto): ResponseEntity<DefaultResponse> =
-        ResponseEntity.status(HttpStatus.NO_CONTENT).body(memberService.duplicateValidate(validateMemberDto))
+        ResponseEntity.status(HttpStatus.OK).body(memberService.duplicateValidate(validateMemberDto))
 }
