@@ -2,6 +2,7 @@ package com.yoong.projectyoongbackend.domain.auth.member.controller
 
 import com.yoong.projectyoongbackend.common.dto.DefaultResponse
 import com.yoong.projectyoongbackend.domain.auth.member.dto.CreateMemberDto
+import com.yoong.projectyoongbackend.domain.auth.member.dto.LoginResponse
 import com.yoong.projectyoongbackend.domain.auth.member.dto.MemberLoginDto
 import com.yoong.projectyoongbackend.domain.auth.member.dto.ValidateMemberDto
 import com.yoong.projectyoongbackend.domain.auth.member.service.MemberService
@@ -26,7 +27,7 @@ class MemberController(
     @PostMapping("/login")
     fun login(
         @RequestBody memberLoginDto: MemberLoginDto
-    ): ResponseEntity<DefaultResponse> =
+    ): ResponseEntity<LoginResponse> =
         ResponseEntity.status(HttpStatus.OK).body(memberService.login(memberLoginDto))
 
     @PostMapping("/sign-up/valid")

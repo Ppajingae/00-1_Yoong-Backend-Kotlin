@@ -4,10 +4,7 @@ import com.yoong.projectyoongbackend.common.dto.DefaultResponse
 import com.yoong.projectyoongbackend.common.exception.handler.DuplicatedException
 import com.yoong.projectyoongbackend.common.exception.handler.LoginFailedException
 import com.yoong.projectyoongbackend.common.exception.handler.ModalNotFoundException
-import com.yoong.projectyoongbackend.domain.auth.member.dto.CreateMemberDto
-import com.yoong.projectyoongbackend.domain.auth.member.dto.MemberLoginDto
-import com.yoong.projectyoongbackend.domain.auth.member.dto.ValidType
-import com.yoong.projectyoongbackend.domain.auth.member.dto.ValidateMemberDto
+import com.yoong.projectyoongbackend.domain.auth.member.dto.*
 import com.yoong.projectyoongbackend.domain.auth.member.entity.Member
 import com.yoong.projectyoongbackend.domain.auth.member.enumClass.Position
 import com.yoong.projectyoongbackend.domain.auth.member.enumClass.Role
@@ -47,7 +44,7 @@ class MemberService(
         return DefaultResponse.from("회원 가입이 완료 되었습니다")
     }
 
-    fun login(memberLoginDto: MemberLoginDto): DefaultResponse {
+    fun login(memberLoginDto: MemberLoginDto): LoginResponse {
 
         val member = memberRepository.findByUserId(memberLoginDto.id) ?: throw ModalNotFoundException(404, "존재 하지 않는 유저 입니다")
 
@@ -57,7 +54,7 @@ class MemberService(
                 email = member.email,
                 role = member.role.name,
                 position = member.position.name)
-            return DefaultResponse(token)
+            return LoginResponse.from(member, token)
         }
 
         throw LoginFailedException("로그인에 실패 하였습니다!! 다시 로그인 해 주세요")
@@ -149,10 +146,10 @@ class MemberService(
             }
         }
 
-        if(validateMemberDto.validId == null){
+        if(validateMemberDto.validId == null) {
             return DefaultResponse.from("$memberId")
+        }else{
+            return DefaultResponse.from("중복 확인 완료 되었습니다")
         }
-
-        return DefaultResponse.from("중복 확인 완료 되었습니다")
     }
 }
