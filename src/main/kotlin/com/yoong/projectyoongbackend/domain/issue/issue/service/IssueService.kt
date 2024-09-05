@@ -95,11 +95,32 @@ class IssueService(
         return DefaultResponse.from("이슈 삭제가 완료 되었습니다")
     }
 
-    fun changeIssueImportant(issueId: Long, requestImportant: RequestImportant): DefaultResponse {
-        TODO()
+    fun changeIssueImportant(memberId: Long, issueId: Long, requestImportant: RequestImportant): DefaultResponse {
+
+        val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException(404, "맴버가 존재 하지 않습니다")
+
+        val issue = issueRepository.findByIdOrNull(issueId) ?: throw ModelNotFoundException(404, "작성된 글이 존재하지 않습니다")
+
+        if(member.team!!.id!! == issue.teamId) throw AccessFailedException(403, "중요도 변경 권한이 없습니다")
+
+        issue.apply {
+            important = requestImportant.important
+        }
+
+        return DefaultResponse.from("중요도 변경이 완료 되었습니다")
     }
 
-    fun changeIssueWorkingStatus(issueId: Long, requestWorkingStatus: RequestWorkingStatus): DefaultResponse {
-        TODO()
+    fun changeIssueWorkingStatus(memberId: Long, issueId: Long, requestWorkingStatus: RequestWorkingStatus): DefaultResponse {
+        val member = memberRepository.findByIdOrNull(memberId) ?: throw ModelNotFoundException(404, "맴버가 존재 하지 않습니다")
+
+        val issue = issueRepository.findByIdOrNull(issueId) ?: throw ModelNotFoundException(404, "작성된 글이 존재하지 않습니다")
+
+        if(member.team!!.id!! == issue.teamId) throw AccessFailedException(403, "진행 상황 변경 권한이 없습니다")
+
+        issue.apply {
+            workingStatus = requestWorkingStatus.workingStatus
+        }
+
+        return DefaultResponse.from("진행 상황 변경이 완료 되었습니다")
     }
 }

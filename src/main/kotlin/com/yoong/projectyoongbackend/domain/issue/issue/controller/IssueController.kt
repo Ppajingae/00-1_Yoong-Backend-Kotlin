@@ -60,17 +60,21 @@ class IssueController(
     ): ResponseEntity<DefaultResponse>
     = ResponseEntity.status(HttpStatus.OK).body(issueService.deleteIssue(userPrincipal.id, issueId))
 
+    @PreAuthorize("@userSecurityService.hasLeaderPosition(principal) or @userSecurityService.hasManagerPosition(principal)")
     @PatchMapping("/{issueId}/important")
     fun changeIssueImportant(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
         @PathVariable issueId: Long,
         @RequestBody requestImportant: RequestImportant
     ): ResponseEntity<DefaultResponse>
-        = ResponseEntity.status(HttpStatus.OK).body(issueService.changeIssueImportant(issueId, requestImportant))
+        = ResponseEntity.status(HttpStatus.OK).body(issueService.changeIssueImportant(userPrincipal.id, issueId, requestImportant))
 
+    @PreAuthorize("@userSecurityService.hasLeaderPosition(principal) or @userSecurityService.hasManagerPosition(principal)")
     @PatchMapping("/{issueId}/working-status")
     fun changeIssueWorkingStatus(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
         @PathVariable issueId: Long,
         @RequestBody requestWorkingStatus: RequestWorkingStatus
     ): ResponseEntity<DefaultResponse>
-            = ResponseEntity.status(HttpStatus.OK).body(issueService.changeIssueWorkingStatus(issueId, requestWorkingStatus))
+            = ResponseEntity.status(HttpStatus.OK).body(issueService.changeIssueWorkingStatus(userPrincipal.id, issueId, requestWorkingStatus))
 }
