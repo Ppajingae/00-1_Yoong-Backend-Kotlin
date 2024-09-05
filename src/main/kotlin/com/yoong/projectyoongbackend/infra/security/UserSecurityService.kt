@@ -22,4 +22,9 @@ class UserSecurityService {
         val userPrincipal = principal as UserPrincipal
         return userPrincipal.positionAuthorities.contains(SimpleGrantedAuthority("POSITION_MEMBER"))
     }
+
+    fun hasAllPosition(principal: Any): Boolean {
+        val userPrincipal = principal as UserPrincipal
+        return userPrincipal.positionAuthorities.isNotEmpty()
+    }
 }

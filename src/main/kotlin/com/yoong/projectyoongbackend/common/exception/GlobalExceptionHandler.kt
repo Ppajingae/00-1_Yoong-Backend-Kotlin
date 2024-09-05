@@ -1,9 +1,6 @@
 package com.yoong.projectyoongbackend.common.exception
 
-import com.yoong.projectyoongbackend.common.exception.handler.BadRequestException
-import com.yoong.projectyoongbackend.common.exception.handler.DuplicatedException
-import com.yoong.projectyoongbackend.common.exception.handler.LoginFailedException
-import com.yoong.projectyoongbackend.common.exception.handler.ModalNotFoundException
+import com.yoong.projectyoongbackend.common.exception.handler.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -12,9 +9,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 @RestControllerAdvice
 class GlobalExceptionHandler {
 
-    @ExceptionHandler(ModalNotFoundException::class)
-    fun modalNotFoundException(e: ModalNotFoundException): ResponseEntity<ModalNotFoundException>
-        = ResponseEntity.status(HttpStatus.NOT_FOUND).body(ModalNotFoundException(e.code, e.msg))
+    @ExceptionHandler(ModelNotFoundException::class)
+    fun modalNotFoundException(e: ModelNotFoundException): ResponseEntity<ModelNotFoundException>
+        = ResponseEntity.status(HttpStatus.NOT_FOUND).body(ModelNotFoundException(e.code, e.msg))
 
     @ExceptionHandler(DuplicatedException::class)
     fun duplicatedException(e: DuplicatedException): ResponseEntity<DuplicatedException>
@@ -27,5 +24,9 @@ class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestException::class)
     fun badRequestException(e: BadRequestException): ResponseEntity<BadRequestException>
             = ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(BadRequestException(e.code, e.msg))
+
+    @ExceptionHandler(AccessFailedException::class)
+    fun accessFailedException(e: AccessFailedException): ResponseEntity<AccessFailedException>
+            = ResponseEntity.status(HttpStatus.FORBIDDEN).body(AccessFailedException(e.code, e.msg))
 
 }
