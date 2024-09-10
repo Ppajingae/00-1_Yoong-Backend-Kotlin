@@ -1,6 +1,7 @@
 package com.yoong.projectyoongbackend.domain.issue.reply.dto
 
 import com.yoong.projectyoongbackend.domain.issue.issue.entity.Issue
+import com.yoong.projectyoongbackend.domain.issue.reply.entity.Reply
 import java.time.LocalDateTime
 
 data class ReplyResponse(
@@ -8,6 +9,15 @@ data class ReplyResponse(
     val description: String,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
-    val issueName: String,
-    val nickName: String,
-)
+){
+    companion object {
+        fun from(reply: Reply): ReplyResponse{
+            return ReplyResponse(
+                id= reply.id!!,
+                description = reply.description,
+                createdAt = reply.createdAt,
+                updatedAt = reply.updatedAt,
+            )
+        }
+    }
+}

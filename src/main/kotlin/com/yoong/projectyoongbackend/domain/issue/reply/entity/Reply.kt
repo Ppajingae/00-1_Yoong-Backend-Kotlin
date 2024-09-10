@@ -4,16 +4,18 @@ import com.yoong.projectyoongbackend.domain.auth.member.entity.Member
 import com.yoong.projectyoongbackend.domain.issue.issue.entity.Issue
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.SQLRestriction
 import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.context.annotation.Description
 import java.time.Instant
 import java.time.LocalDateTime
 
+@SQLRestriction("is_deleted=false")
 @Entity
 class Reply(
 
     @Column(name="description", nullable = false)
-    val description: String,
+    var description: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="issue_id", nullable = false)
@@ -36,8 +38,8 @@ class Reply(
     val updatedAt: LocalDateTime = LocalDateTime.now()
 
     @Column(name ="deleted_at", nullable = true)
-    val deletedAt: LocalDateTime? = null
+    var deletedAt: LocalDateTime? = null
 
     @Column(name = "is_deleted", nullable = false)
-    val isDeleted: Boolean = false
+    var isDeleted: Boolean = false
 }
