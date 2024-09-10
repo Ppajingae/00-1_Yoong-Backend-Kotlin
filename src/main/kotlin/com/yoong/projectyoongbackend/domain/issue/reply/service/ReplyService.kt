@@ -56,7 +56,7 @@ class ReplyService(
         if(reply.member.id != memberId) throw AccessFailedException(403, "수정 권한이 없습니다")
 
         reply.apply {
-            description = reply.description
+            description = updateReplyDto.description
         }
 
         return DefaultResponse.from("댓글 수정이 완료 되었습니다")

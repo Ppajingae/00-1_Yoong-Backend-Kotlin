@@ -20,9 +20,14 @@ interface ReplyRepository {
     fun save(reply: Reply): Reply
 
     fun findAllByMyIssue(memberId: Long, pageable: Pageable): Page<Reply>
+
+    fun findAllByIssueId(issueId: Long): List<Reply>
 }
 
-interface ReplyJpaRepository: JpaRepository<Reply, Long>
+interface ReplyJpaRepository: JpaRepository<Reply, Long>{
+
+    fun findAllByIssueId(issueId: Long): List<Reply>
+}
 
 @Repository
 class ReplyRepositoryImpl(
@@ -47,4 +52,6 @@ class ReplyRepositoryImpl(
 
         return PageImpl(query, pageable, query.size.toLong())
     }
+
+    override fun findAllByIssueId(issueId: Long): List<Reply> = replyJpaRepository.findAllByIssueId(issueId)
 }

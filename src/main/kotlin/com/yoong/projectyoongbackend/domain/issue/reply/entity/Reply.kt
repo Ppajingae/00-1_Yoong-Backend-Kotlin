@@ -22,7 +22,7 @@ class Reply(
     val issue: Issue,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="issue_id", nullable = false)
+    @JoinColumn(name="member_id", nullable = false)
     val member: Member
 ){
 

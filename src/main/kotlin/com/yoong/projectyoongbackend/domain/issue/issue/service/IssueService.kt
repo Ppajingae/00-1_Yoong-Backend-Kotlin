@@ -8,6 +8,7 @@ import com.yoong.projectyoongbackend.domain.issue.issue.dto.*
 import com.yoong.projectyoongbackend.domain.issue.issue.entity.Issue
 import com.yoong.projectyoongbackend.domain.issue.issue.enumClass.WorkingStatus
 import com.yoong.projectyoongbackend.domain.issue.issue.repository.IssueRepository
+import com.yoong.projectyoongbackend.domain.issue.reply.repository.ReplyRepository
 import org.springframework.stereotype.Service
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -17,7 +18,8 @@ import java.time.LocalDateTime
 @Service
 class IssueService(
     private val issueRepository: IssueRepository,
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
+    private val replyRepository: ReplyRepository,
 ){
     @Transactional
     fun createIssue(memberId: Long, createIssueDto: CreateIssueDto): DefaultResponse {
@@ -46,9 +48,11 @@ class IssueService(
 
         val issue = issueRepository.findByIdOrNull(issueId) ?: throw ModelNotFoundException(404, "작성된 글이 존재하지 않습니다")
 
+        val replyList = replyRepository.findAllByIssueId(issueId)
+
         if(member.team!!.id != issue.teamId) throw AccessFailedException(403, "권한이 없습니다")
 
-        return IssueResponse.from(issue)
+        return IssueResponse.from(issue, replyList)
     }
 
     fun getIssuePage(memberId: Long, pageable: Pageable): Page<IssuePageResponse> {
