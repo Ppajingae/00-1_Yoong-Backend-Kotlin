@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
-    id("org.springframework.boot") version "3.4.0-SNAPSHOT"
+    id("org.springframework.boot") version "3.3.0-SNAPSHOT"
     id("io.spring.dependency-management") version "1.1.6"
     kotlin("plugin.jpa") version "1.9.25"
     kotlin("kapt") version "1.9.24"
@@ -12,7 +12,7 @@ version = "0.0.1-SNAPSHOT"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -22,7 +22,7 @@ repositories {
     maven { url = uri("https://repo.spring.io/snapshot") }
 }
 
-val queryDslVersion = "5.0.0"
+val queryDslVersion = "5.1.0"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
