@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 interface ReplyRepository {
+
+    fun findByIdOrNull(id: Long): Reply?
 }
 
 interface ReplyJpaRepository: JpaRepository<Reply, Long>
@@ -12,4 +14,9 @@ interface ReplyJpaRepository: JpaRepository<Reply, Long>
 @Repository
 class ReplyRepositoryImpl(
     private val replyJpaRepository: ReplyJpaRepository
-)
+): ReplyRepository {
+
+    override fun findByIdOrNull(id: Long): Reply? {
+        TODO("Not yet implemented")
+    }
+}
