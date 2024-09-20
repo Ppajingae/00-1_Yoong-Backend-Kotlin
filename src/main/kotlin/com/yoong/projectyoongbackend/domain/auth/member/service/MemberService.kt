@@ -4,11 +4,12 @@ import com.yoong.projectyoongbackend.common.dto.DefaultResponse
 import com.yoong.projectyoongbackend.common.exception.handler.DuplicatedException
 import com.yoong.projectyoongbackend.common.exception.handler.LoginFailedException
 import com.yoong.projectyoongbackend.common.exception.handler.ModelNotFoundException
-import com.yoong.projectyoongbackend.domain.auth.member.dto.*
-import com.yoong.projectyoongbackend.domain.auth.member.entity.Member
-import com.yoong.projectyoongbackend.domain.auth.member.enumClass.Position
-import com.yoong.projectyoongbackend.domain.auth.member.enumClass.Role
+import com.yoong.projectyoongbackend.domain.auth.member.dto.CreateMemberDto
+import com.yoong.projectyoongbackend.domain.auth.member.dto.LoginResponse
+import com.yoong.projectyoongbackend.domain.auth.member.dto.MemberLoginDto
+import com.yoong.projectyoongbackend.domain.auth.member.dto.ValidateMemberDto
 import com.yoong.projectyoongbackend.domain.auth.member.repository.MemberRepository
+import com.yoong.projectyoongbackend.domain.auth.member.valid_class.AuthDuplicatedValidator
 import com.yoong.projectyoongbackend.domain.auth.team.repository.TeamRepository
 import com.yoong.projectyoongbackend.infra.jwt.JwtPlugin
 import com.yoong.projectyoongbackend.infra.jwt.PasswordEncoder
@@ -20,6 +21,7 @@ class MemberService(
     private val memberRepository: MemberRepository,
     private val jwtPlugin: JwtPlugin,
     private val teamRepository: TeamRepository,
+    private val authDuplicatedValidator: AuthDuplicatedValidator
 ){
 
     private val passwordEncoder = PasswordEncoder().bCryptPasswordEncoder()
@@ -63,93 +65,19 @@ class MemberService(
     @Transactional
     fun duplicateValidate(validateMemberDto: ValidateMemberDto): DefaultResponse {
 
-        var memberId: Long = 0
+        var memberId: Long? = 0
 
-        when(validateMemberDto.validType){
-            ValidType.USER_ID -> {
-                if(memberRepository.existsByUserId(validateMemberDto.validArgument)) throw ModelNotFoundException(404, "중복 되는 아이디 값이 존재 합니다")
-                if(validateMemberDto.validId == null){
-                    val member = memberRepository.saveAndFlush(
-                        Member(
-                            userId = validateMemberDto.validArgument,
-                            password = "",
-                            email = "",
-                            nickname = "",
-                            role = Role.MEMBER,
-                            position = Position.MEMBER,
-                            team = null
-                        )
-                    )
 
-                    member.apply { isId = true }
+        memberId = authDuplicatedValidator.checkDuplicated(validateMemberDto, memberRepository)
 
-                    memberId = member.id!!
-                }else{
-                    val member = memberRepository.findByIdOrNull(validateMemberDto.validId)?: throw ModelNotFoundException(404, "맴버가 존재 하지 않습니다")
+        if(memberId == null) throw ModelNotFoundException(404, "아이디가 존재하지 않습니다")
 
-                    member.updateValid(validateMemberDto.validType, validateMemberDto.validArgument)
 
-                    memberRepository.save(member)
-                }
-            }
-            ValidType.EMAIL -> {
-                if(memberRepository.existsByEmail(validateMemberDto.validArgument)) throw ModelNotFoundException(404, "중복 되는 이메일 값이 존재 합니다")
-                if(validateMemberDto.validId == null){
-                    val member = memberRepository.saveAndFlush(
-                        Member(
-                            userId = "",
-                            password = "",
-                            email = validateMemberDto.validArgument,
-                            nickname = "",
-                            role = Role.MEMBER,
-                            position = Position.MEMBER,
-                            team = null
-                        )
-                    )
 
-                    member.apply { isEmail = true }
-
-                    memberId = member.id!!
-                }else{
-                    val member = memberRepository.findByIdOrNull(validateMemberDto.validId)?: throw ModelNotFoundException(404, "맴버가 존재 하지 않습니다")
-
-                    member.updateValid(validateMemberDto.validType, validateMemberDto.validArgument)
-
-                    memberRepository.save(member)
-                }
-            }
-            ValidType.NICKNAME -> {
-                if(memberRepository.existsByNickname(validateMemberDto.validArgument)) throw ModelNotFoundException(404, "중복 되는 닉네임 값이 존재 합니다")
-                if(validateMemberDto.validId == null){
-                    val member = memberRepository.saveAndFlush(
-                        Member(
-                            userId = "",
-                            password = "",
-                            email = "",
-                            nickname = validateMemberDto.validArgument,
-                            role = Role.MEMBER,
-                            position = Position.MEMBER,
-                            team = null
-                        )
-                    )
-
-                    member.apply { isNickName = true }
-
-                    memberId = member.id!!
-                }else{
-                    val member = memberRepository.findByIdOrNull(validateMemberDto.validId)?: throw ModelNotFoundException(404, "맴버가 존재 하지 않습니다")
-
-                    member.updateValid(validateMemberDto.validType, validateMemberDto.validArgument)
-
-                    memberRepository.save(member)
-                }
-            }
-        }
-
-        if(validateMemberDto.validId == null) {
-            return DefaultResponse.from("$memberId")
+        return if(validateMemberDto.validId == null) {
+            DefaultResponse.from("$memberId")
         }else{
-            return DefaultResponse.from("중복 확인 완료 되었습니다")
+            DefaultResponse.from("중복 확인 완료 되었습니다")
         }
     }
 }
