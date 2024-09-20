@@ -3,11 +3,8 @@ package com.yoong.projectyoongbackend.domain.auth.member.service
 import com.yoong.projectyoongbackend.common.dto.DefaultResponse
 import com.yoong.projectyoongbackend.common.exception.handler.DuplicatedException
 import com.yoong.projectyoongbackend.common.exception.handler.LoginFailedException
-import com.yoong.projectyoongbackend.common.exception.handler.ModalNotFoundException
-import com.yoong.projectyoongbackend.domain.auth.member.dto.CreateMemberDto
-import com.yoong.projectyoongbackend.domain.auth.member.dto.MemberLoginDto
-import com.yoong.projectyoongbackend.domain.auth.member.dto.ValidType
-import com.yoong.projectyoongbackend.domain.auth.member.dto.ValidateMemberDto
+import com.yoong.projectyoongbackend.common.exception.handler.ModelNotFoundException
+import com.yoong.projectyoongbackend.domain.auth.member.dto.*
 import com.yoong.projectyoongbackend.domain.auth.member.entity.Member
 import com.yoong.projectyoongbackend.domain.auth.member.enumClass.Position
 import com.yoong.projectyoongbackend.domain.auth.member.enumClass.Role
@@ -30,7 +27,7 @@ class MemberService(
     @Transactional
     fun signUp(createMemberDto: CreateMemberDto): DefaultResponse {
 
-        val member = memberRepository.findByIdOrNull(createMemberDto.id) ?: throw ModalNotFoundException(404, "아이디가 존재 하지 않습니다")
+        val member = memberRepository.findByIdOrNull(createMemberDto.id) ?: throw ModelNotFoundException(404, "아이디가 존재 하지 않습니다")
 
         if(member.isId && member.isEmail && member.isNickName) {
 
@@ -47,9 +44,9 @@ class MemberService(
         return DefaultResponse.from("회원 가입이 완료 되었습니다")
     }
 
-    fun login(memberLoginDto: MemberLoginDto): DefaultResponse {
+    fun login(memberLoginDto: MemberLoginDto): LoginResponse {
 
-        val member = memberRepository.findByUserId(memberLoginDto.id) ?: throw ModalNotFoundException(404, "존재 하지 않는 유저 입니다")
+        val member = memberRepository.findByUserId(memberLoginDto.id) ?: throw ModelNotFoundException(404, "존재 하지 않는 유저 입니다")
 
         if (passwordEncoder.matches(memberLoginDto.password, member.password)) {
             val token = jwtPlugin.generateAccessToken(
@@ -57,7 +54,7 @@ class MemberService(
                 email = member.email,
                 role = member.role.name,
                 position = member.position.name)
-            return DefaultResponse(token)
+            return LoginResponse.from(member, token)
         }
 
         throw LoginFailedException("로그인에 실패 하였습니다!! 다시 로그인 해 주세요")
@@ -70,7 +67,7 @@ class MemberService(
 
         when(validateMemberDto.validType){
             ValidType.USER_ID -> {
-                if(memberRepository.existsByUserId(validateMemberDto.validArgument)) throw ModalNotFoundException(404, "중복 되는 아이디 값이 존재 합니다")
+                if(memberRepository.existsByUserId(validateMemberDto.validArgument)) throw ModelNotFoundException(404, "중복 되는 아이디 값이 존재 합니다")
                 if(validateMemberDto.validId == null){
                     val member = memberRepository.saveAndFlush(
                         Member(
@@ -88,7 +85,7 @@ class MemberService(
 
                     memberId = member.id!!
                 }else{
-                    val member = memberRepository.findByIdOrNull(validateMemberDto.validId)?: throw ModalNotFoundException(404, "맴버가 존재 하지 않습니다")
+                    val member = memberRepository.findByIdOrNull(validateMemberDto.validId)?: throw ModelNotFoundException(404, "맴버가 존재 하지 않습니다")
 
                     member.updateValid(validateMemberDto.validType, validateMemberDto.validArgument)
 
@@ -96,7 +93,7 @@ class MemberService(
                 }
             }
             ValidType.EMAIL -> {
-                if(memberRepository.existsByEmail(validateMemberDto.validArgument)) throw ModalNotFoundException(404, "중복 되는 이메일 값이 존재 합니다")
+                if(memberRepository.existsByEmail(validateMemberDto.validArgument)) throw ModelNotFoundException(404, "중복 되는 이메일 값이 존재 합니다")
                 if(validateMemberDto.validId == null){
                     val member = memberRepository.saveAndFlush(
                         Member(
@@ -114,7 +111,7 @@ class MemberService(
 
                     memberId = member.id!!
                 }else{
-                    val member = memberRepository.findByIdOrNull(validateMemberDto.validId)?: throw ModalNotFoundException(404, "맴버가 존재 하지 않습니다")
+                    val member = memberRepository.findByIdOrNull(validateMemberDto.validId)?: throw ModelNotFoundException(404, "맴버가 존재 하지 않습니다")
 
                     member.updateValid(validateMemberDto.validType, validateMemberDto.validArgument)
 
@@ -122,7 +119,7 @@ class MemberService(
                 }
             }
             ValidType.NICKNAME -> {
-                if(memberRepository.existsByNickname(validateMemberDto.validArgument)) throw ModalNotFoundException(404, "중복 되는 닉네임 값이 존재 합니다")
+                if(memberRepository.existsByNickname(validateMemberDto.validArgument)) throw ModelNotFoundException(404, "중복 되는 닉네임 값이 존재 합니다")
                 if(validateMemberDto.validId == null){
                     val member = memberRepository.saveAndFlush(
                         Member(
@@ -140,7 +137,7 @@ class MemberService(
 
                     memberId = member.id!!
                 }else{
-                    val member = memberRepository.findByIdOrNull(validateMemberDto.validId)?: throw ModalNotFoundException(404, "맴버가 존재 하지 않습니다")
+                    val member = memberRepository.findByIdOrNull(validateMemberDto.validId)?: throw ModelNotFoundException(404, "맴버가 존재 하지 않습니다")
 
                     member.updateValid(validateMemberDto.validType, validateMemberDto.validArgument)
 
@@ -149,10 +146,10 @@ class MemberService(
             }
         }
 
-        if(validateMemberDto.validId == null){
+        if(validateMemberDto.validId == null) {
             return DefaultResponse.from("$memberId")
+        }else{
+            return DefaultResponse.from("중복 확인 완료 되었습니다")
         }
-
-        return DefaultResponse.from("중복 확인 완료 되었습니다")
     }
 }
